@@ -11,6 +11,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ParseScopus {
@@ -33,13 +35,17 @@ public class ParseScopus {
                     .referrer("https://google.com")
                     .get();
             Elements elements = document.getElementsByClass("checkbox-label");
+            List<Scopus> scopusList = new ArrayList<>();
             for (Element element : elements) {
                 String title = element.ownText();
                 if (!this.scopusService.isExist(title)) {
                     Scopus scopus = new Scopus();
                     scopus.setScopusTitle(title);
-                    this.scopusService.save(scopus);
+                    scopusList.add(scopus);
                 }
+            }
+            if (!scopusList.isEmpty()) {
+                this.scopusService.save(scopusList);
             }
         } catch (IOException e) {
             e.printStackTrace();

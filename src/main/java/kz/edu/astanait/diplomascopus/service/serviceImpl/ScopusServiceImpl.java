@@ -19,8 +19,8 @@ public class ScopusServiceImpl implements ScopusService {
     }
 
     @Override
-    public void save(Scopus scopus) {
-        this.scopusRepository.save(scopus);
+    public void save(List<Scopus> scopusList) {
+        this.scopusRepository.saveAll(scopusList);
     }
 
     @Override

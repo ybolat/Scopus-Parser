@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ScopusService {
 
-    void save(Scopus scopus);
+    void save(List<Scopus> scopusList);
 
     boolean isExist(String scopusTitle);
 
