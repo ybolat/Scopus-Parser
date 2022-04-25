@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/scopus-diploma-db
+    username: postgres
+    password: 123
