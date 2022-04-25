@@ -1,4 +1,4 @@
-package kz.edu.astanait.diplomascopus.serviceInterface;
+package kz.edu.astanait.diplomascopus.service.serviceInterface;
 
 import kz.edu.astanait.diplomascopus.model.Scopus;
 

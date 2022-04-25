@@ -1,7 +1,7 @@
 package kz.edu.astanait.diplomascopus.controller;
 
 import kz.edu.astanait.diplomascopus.model.Scopus;
-import kz.edu.astanait.diplomascopus.serviceInterface.ScopusService;
+import kz.edu.astanait.diplomascopus.service.serviceInterface.ScopusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

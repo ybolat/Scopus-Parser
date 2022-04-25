@@ -1,7 +1,7 @@
 package kz.edu.astanait.diplomascopus.parser;
 
 import kz.edu.astanait.diplomascopus.model.Scopus;
-import kz.edu.astanait.diplomascopus.serviceInterface.ScopusService;
+import kz.edu.astanait.diplomascopus.service.serviceInterface.ScopusService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

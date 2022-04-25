@@ -1,8 +1,8 @@
-package kz.edu.astanait.diplomascopus.serviceImpl;
+package kz.edu.astanait.diplomascopus.service.serviceImpl;
 
 import kz.edu.astanait.diplomascopus.model.Scopus;
 import kz.edu.astanait.diplomascopus.repository.ScopusRepository;
-import kz.edu.astanait.diplomascopus.serviceInterface.ScopusService;
+import kz.edu.astanait.diplomascopus.service.serviceInterface.ScopusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
