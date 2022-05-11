@@ -9,22 +9,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/scopus")
-public class ScopusService {
+public class ScopusController {
 
     private final ParseScopusService parseScopusService;
 
     @Autowired
-    public ScopusService(ParseScopusService parseScopusService) {
+    public ScopusController(ParseScopusService parseScopusService) {
         this.parseScopusService = parseScopusService;
     }
 
-    @GetMapping("/getInformation")
-    public ResponseEntity<List<List<String>>> getInformation(@RequestParam(name = "id") String id) {
-        List<List<String>> information = this.parseScopusService.parse(id);
+    @GetMapping("/get-information")
+    public ResponseEntity<HashMap<String, List<String>>> getInformation(@RequestParam(name = "id") String id) throws InterruptedException {
+        HashMap<String, List<String>> information = this.parseScopusService.parse(id);
         return new ResponseEntity<>(information, HttpStatus.OK);
     }
 }
