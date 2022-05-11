@@ -6,11 +6,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,10 +69,11 @@ public class ParseScopusService {
 
                 Elements elementsTitles = document.getElementsByClass("list-title");
                 List<String> titles = new ArrayList<>();
+                List<String> hrefs = new ArrayList<>();
 
                 for (Element element : elementsTitles) {
                     titles.add(element.ownText());
-//                System.out.println(element.attr("href"));
+                    hrefs.add(element.attr("href"));
                 }
 
                 Elements documentAuthorsElements = document.getElementsByClass("author-list");
@@ -97,15 +101,29 @@ public class ParseScopusService {
                     }
                 }
 
+                result.put("hrefs " + page, hrefs);
                 result.put("publisher " + page, sources);
                 result.put("articleType " + page, articleTypes);
                 result.put("titles " + page, titles);
-            }
 
+                if (num != i + 1) {
+                    WebElement paginationBtn = webDriver.findElement(By.xpath("//*[@id=\"scopus-author-profile-page-control-microui__documents-panel\"]/els-stack/div/div[2]/div/els-results-layout/els-paginator/nav/ul/li[4]/button"));
+                    paginationBtn.click();
+                    Thread.sleep(10000);
+                    document = Jsoup.parse(webDriver.getPageSource());
+                }
+            }
             return result;
         }catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String getDoi(String url) throws IOException {
+        Document document = Jsoup.connect(url).get();
+        Elements elements = document.getElementsByAttributeValueMatching("NAME", "dc.identifier");
+
+        return elements.get(0).attr("content");
     }
 }
