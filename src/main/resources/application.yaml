@@ -1,3 +1,6 @@
+server:
+  port: 8100
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/scopus-diploma-db
