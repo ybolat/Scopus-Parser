@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/scopus")
@@ -24,10 +23,16 @@ public class ScopusController {
         this.parseScopusService = parseScopusService;
     }
 
-    @GetMapping("/get-information")
-    public ResponseEntity<HashMap<String, List<String>>> getInformation(@RequestParam(name = "id") String id) throws InterruptedException {
-        HashMap<String, List<String>> information = this.parseScopusService.parse(id);
-        return new ResponseEntity<>(information, HttpStatus.OK);
+    @GetMapping("/get/author")
+    public ResponseEntity<HashMap<String, String>> getInformationAboutAuthor(@RequestParam(name = "url") String url) throws InterruptedException {
+        return new ResponseEntity<>(this.parseScopusService.getInformationAboutAuthor(url), HttpStatus.OK);
+    }
+
+    @GetMapping("/get/information")
+    public ResponseEntity<HashMap<Integer, String>> getArticles(@RequestParam(name = "id") String id) throws InterruptedException {
+        HashMap<Integer, String> result = this.parseScopusService.getArticles(id);
+        if(!result.isEmpty()) return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @GetMapping("/get-doi")

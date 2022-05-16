@@ -2,6 +2,7 @@ package kz.edu.astanait.diplomawork.service;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,29 +23,50 @@ import java.util.List;
 @Service
 public class ParseScopusService {
 
-    public HashMap<String, List<String>> parse(String id) throws NoSuchElementException, InterruptedException {
-        String url = "https://www.scopus.com/authid/detail.uri?authorId=" + id;
+    private static final String url = "https://www.scopus.com/authid/detail.uri?authorId=";
+
+//    private Document getPage(String id) throws InterruptedException {
+//        System.setProperty("webdriver.chrome.driver", "selenium\\chromedriver.exe");
+//        WebDriver webDriver = new ChromeDriver();
+//        webDriver.get(url + id);
+//        webDriver.navigate().refresh();
+//        Thread.sleep(3000);
+//        return Jsoup.parse(webDriver.getPageSource());
+//    }
+
+    public HashMap<String, String> getInformationAboutAuthor(String id) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "selenium\\chromedriver.exe");
-
         WebDriver webDriver = new ChromeDriver();
-        webDriver.get(url);
-
+        webDriver.get(url + id);
         webDriver.navigate().refresh();
-        Thread.sleep(5000);
+        Thread.sleep(3000);
 
         Document document = Jsoup.parse(webDriver.getPageSource());
-        HashMap<String, List<String>> result = new HashMap<>();
+        HashMap<String, String> result = new HashMap<>();
+
+        Elements orcid = document.getElementsContainingOwnText("https://orcid.org/");
+        String author_orcid = orcid.get(0).ownText();
+
+        Elements elementsAuthor = document.getElementsByClass("AuthorHeader-module__syvlN");
+        String author = elementsAuthor.get(0).ownText();
+
+        result.put(author, author_orcid.substring(18));
+        return result;
+    }
+
+    public HashMap<Integer, String> getArticles(String id) throws NoSuchElementException, InterruptedException {
+        System.setProperty("webdriver.chrome.driver", "selenium\\chromedriver.exe");
+        WebDriver webDriver = new ChromeDriver();
+        webDriver.get(url + id);
+        webDriver.navigate().refresh();
+        Thread.sleep(3000);
+
+        Document document = Jsoup.parse(webDriver.getPageSource());
+        HashMap<Integer, String> result = new HashMap<>();
 
         try {
-            Elements orcid = document.getElementsContainingOwnText("https://orcid.org/");
-            List<String> author_orcid = new ArrayList<>();
-
-            author_orcid.add(orcid.get(0).ownText());
-            result.put("orcid", author_orcid);
-
             Elements numberOfPages = document.getElementsByClass("button--link-black");
-
-            String number = numberOfPages.get(numberOfPages.size() -2).children().get(0).ownText();
+            String number = numberOfPages.get(numberOfPages.size() - 2).children().get(0).ownText();
             int num = 0;
 
             try {
@@ -52,41 +75,43 @@ public class ParseScopusService {
                 e.printStackTrace();
             }
 
-            Elements elementsAuthor = document.getElementsByClass("AuthorHeader-module__syvlN");
-            List<String> author = new ArrayList<>();
-            author.add(elementsAuthor.get(0).ownText());
-
-            result.put("author", author);
-
             for (int i = 0; i < num; i++) {
-                int page = i + 1;
                 Elements elementsArticleTypes = document.getElementsByClass("article-type-line");
                 List<String> articleTypes = new ArrayList<>();
 
                 for (Element element : elementsArticleTypes) {
-                    articleTypes.add(element.ownText());
+                    String articleType = element.ownText();
+                    if (!articleType.isEmpty()) articleTypes.add(element.ownText());
                 }
 
                 Elements elementsTitles = document.getElementsByClass("list-title");
                 List<String> titles = new ArrayList<>();
                 List<String> hrefs = new ArrayList<>();
+                List<String> doi = new ArrayList<>();
 
                 for (Element element : elementsTitles) {
-                    titles.add(element.ownText());
-                    hrefs.add(element.attr("href"));
+                    String title = element.ownText();
+                    if (!title.isEmpty()) {
+                        titles.add(title);
+                        hrefs.add(element.attr("href"));
+                    }
                 }
 
+                for (String href : hrefs) {
+                    doi.add(this.getDoi(href));
+                }
+
+                List<String> documentAuthors = new ArrayList<>();
+
                 Elements documentAuthorsElements = document.getElementsByClass("author-list");
-                int j = 1;
                 for (Element element : documentAuthorsElements) {
                     Elements elements = element.children();
-                    List<String> documentAuthors = new ArrayList<>();
+                    StringBuilder docAuthors = new StringBuilder();
 
                     for (Element authors : elements) {
-                        documentAuthors.add(authors.children().get(0).ownText());
+                        docAuthors.append(authors.children().get(0).ownText());
                     }
-                    result.put("documentAuthors " + j + " " + page, documentAuthors);
-                    j++;
+                    documentAuthors.add(docAuthors.toString());
                 }
 
                 Elements sourceElements = document.getElementsByAttributeValueMatching("data-component", "document-source");
@@ -101,23 +126,27 @@ public class ParseScopusService {
                     }
                 }
 
-                result.put("hrefs " + page, hrefs);
-                result.put("publisher " + page, sources);
-                result.put("articleType " + page, articleTypes);
-                result.put("titles " + page, titles);
+                List<String> resultList = new ArrayList<>();
+                for (int q = 0; q < documentAuthors.size(); q++) {
+                    resultList.add(titles.get(q) + "$" + articleTypes.get(q) + "<" + doi.get(q) + ">" + documentAuthors.get(q) +
+                            "{" + sources.get(q));
+                }
+
+                for (int j = 0; j < resultList.size(); j++) {
+                    result.put(j + 1, resultList.get(j));
+                }
 
                 if (num != i + 1) {
                     WebElement paginationBtn = webDriver.findElement(By.xpath("//*[@id=\"scopus-author-profile-page-control-microui__documents-panel\"]/els-stack/div/div[2]/div/els-results-layout/els-paginator/nav/ul/li[4]/button"));
                     paginationBtn.click();
-                    Thread.sleep(10000);
+                    Thread.sleep(3000);
                     document = Jsoup.parse(webDriver.getPageSource());
                 }
             }
-            return result;
         }catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return result;
     }
 
     public String getDoi(String url) throws IOException {
