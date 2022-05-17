@@ -14,7 +14,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.stereotype.Service;
 
-import javax.print.Doc;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,6 +59,8 @@ public class ParseScopusService {
         webDriver.get(url + id);
         webDriver.navigate().refresh();
         Thread.sleep(3000);
+
+        int count = 1;
 
         Document document = Jsoup.parse(webDriver.getPageSource());
         HashMap<Integer, String> result = new HashMap<>();
@@ -132,8 +133,9 @@ public class ParseScopusService {
                             "{" + sources.get(q));
                 }
 
-                for (int j = 0; j < resultList.size(); j++) {
-                    result.put(j + 1, resultList.get(j));
+                for (String s : resultList) {
+                    result.put(count, s);
+                    count += 1;
                 }
 
                 if (num != i + 1) {

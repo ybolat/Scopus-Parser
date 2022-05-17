@@ -24,8 +24,8 @@ public class ScopusController {
     }
 
     @GetMapping("/get/author")
-    public ResponseEntity<HashMap<String, String>> getInformationAboutAuthor(@RequestParam(name = "url") String url) throws InterruptedException {
-        return new ResponseEntity<>(this.parseScopusService.getInformationAboutAuthor(url), HttpStatus.OK);
+    public ResponseEntity<HashMap<String, String>> getInformationAboutAuthor(@RequestParam(name = "id") String id) throws InterruptedException {
+        return new ResponseEntity<>(this.parseScopusService.getInformationAboutAuthor(id), HttpStatus.OK);
     }
 
     @GetMapping("/get/information")
@@ -33,11 +33,5 @@ public class ScopusController {
         HashMap<Integer, String> result = this.parseScopusService.getArticles(id);
         if(!result.isEmpty()) return new ResponseEntity<>(result, HttpStatus.OK);
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @GetMapping("/get-doi")
-    public ResponseEntity<String> getDoi(@RequestParam(name = "url") String url) throws IOException {
-        String doi = this.parseScopusService.getDoi(url);
-        return new ResponseEntity<>(doi, HttpStatus.OK);
     }
 }
