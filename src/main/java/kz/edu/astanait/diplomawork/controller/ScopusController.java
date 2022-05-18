@@ -1,6 +1,6 @@
 package kz.edu.astanait.diplomawork.controller;
 
-import kz.edu.astanait.diplomawork.service.ParseScopusService;
+import kz.edu.astanait.diplomawork.service.serviceImpl.ParseScopusServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,17 +9,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/v1/scopus")
 public class ScopusController {
 
-    private final ParseScopusService parseScopusService;
+    private final ParseScopusServiceImpl parseScopusService;
 
     @Autowired
-    public ScopusController(ParseScopusService parseScopusService) {
+    public ScopusController(ParseScopusServiceImpl parseScopusService) {
         this.parseScopusService = parseScopusService;
     }
 

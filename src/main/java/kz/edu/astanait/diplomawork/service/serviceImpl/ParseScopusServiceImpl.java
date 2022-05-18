@@ -1,8 +1,6 @@
-package kz.edu.astanait.diplomawork.service;
+package kz.edu.astanait.diplomawork.service.serviceImpl;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import org.apache.logging.log4j.util.Strings;
+import kz.edu.astanait.diplomawork.service.serviceInterface.ParseScopusService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,23 +18,15 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class ParseScopusService {
+public class ParseScopusServiceImpl implements ParseScopusService {
 
-    private static final String url = "https://www.scopus.com/authid/detail.uri?authorId=";
+//    private static final String url = "https://www.scopus.com/authid/detail.uri?authorId=";
 
-//    private Document getPage(String id) throws InterruptedException {
-//        System.setProperty("webdriver.chrome.driver", "selenium\\chromedriver.exe");
-//        WebDriver webDriver = new ChromeDriver();
-//        webDriver.get(url + id);
-//        webDriver.navigate().refresh();
-//        Thread.sleep(3000);
-//        return Jsoup.parse(webDriver.getPageSource());
-//    }
-
+    @Override
     public HashMap<String, String> getInformationAboutAuthor(String id) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver", "selenium\\chromedriver.exe");
         WebDriver webDriver = new ChromeDriver();
-        webDriver.get(url + id);
+        webDriver.get(id);
         webDriver.navigate().refresh();
         Thread.sleep(3000);
 
@@ -49,14 +39,15 @@ public class ParseScopusService {
         Elements elementsAuthor = document.getElementsByClass("AuthorHeader-module__syvlN");
         String author = elementsAuthor.get(0).ownText();
 
-        result.put(author, author_orcid.substring(18));
+        result.put(author, author_orcid);
         return result;
     }
 
+    @Override
     public HashMap<Integer, String> getArticles(String id) throws NoSuchElementException, InterruptedException {
         System.setProperty("webdriver.chrome.driver", "selenium\\chromedriver.exe");
         WebDriver webDriver = new ChromeDriver();
-        webDriver.get(url + id);
+        webDriver.get(id);
         webDriver.navigate().refresh();
         Thread.sleep(3000);
 
