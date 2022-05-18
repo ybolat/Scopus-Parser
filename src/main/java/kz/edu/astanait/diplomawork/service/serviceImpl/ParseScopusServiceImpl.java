@@ -42,7 +42,7 @@ public class ParseScopusServiceImpl implements ParseScopusService {
         result.put(author, author_orcid);
         return result;
     }
-
+asdasd
     @Override
     public HashMap<Integer, String> getArticles(String id) throws NoSuchElementException, InterruptedException {
         System.setProperty("webdriver.chrome.driver", "selenium\\chromedriver.exe");
